@@ -8,10 +8,9 @@ env:
   ASSET_NAME: "exechc-ubuntu-x86_64.tar.gz"
 
 jobs:
-  build:
+  release:
     name: Publish binaries
     runs-on: ubuntu-latest
-
     steps:
 
       - name: Checkout
@@ -38,11 +37,11 @@ jobs:
             ./exechc
           outPath: ${{ env.ASSET_NAME }}
 
-    - name: Upload binaries to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        file: ${{ env.ASSET_NAME }}
-        asset_name: exechc-ubuntu
-        tag: ${{ github.ref }}
-        overwrite: true
-        body: "Exec hc"
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: ${{ env.ASSET_NAME }}
+          asset_name: exechc-ubuntu
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: "Exec hc"
