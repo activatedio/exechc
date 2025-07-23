@@ -41,7 +41,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           file: ${{ env.ASSET_NAME }}
-          asset_name: exechc-ubuntu
+          asset_name: ${{ env.ASSET_NAME }}
           tag: ${{ github.ref }}
           overwrite: true
           body: "Exec hc"
