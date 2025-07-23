@@ -1,3 +1,4 @@
+// Package main runner for app
 package main
 
 import (
@@ -15,9 +16,10 @@ import (
 )
 
 const (
-	ConfigKeyPrefix = "exechc"
+	configKeyPrefix = "exechc"
 )
 
+// CLI command line arguments
 var CLI struct {
 	Run struct {
 		ConfigPath string `help:"Config path."`
@@ -44,7 +46,7 @@ func run(configPath string) error {
 
 	cfg := cs.NewConfig()
 
-	cfg.AddSource(sources.NewSource(ConfigKeyPrefix, &exechc.Runtime{
+	cfg.AddSource(sources.NewSource(configKeyPrefix, &exechc.Runtime{
 		Port: 8080,
 		Host: "localhost",
 	}))
@@ -53,11 +55,11 @@ func run(configPath string) error {
 		cfg.AddSource(yaml.NewSourceFromPath(configPath, ""))
 	}
 
-	cfg.AddLateBindingSource(sources.NewEnvLateBindingSource(strings.ToUpper(ConfigKeyPrefix)))
+	cfg.AddLateBindingSource(sources.NewEnvLateBindingSource(strings.ToUpper(configKeyPrefix)))
 
 	res := &exechc.Runtime{}
 
-	err := cfg.Read(ConfigKeyPrefix, res)
+	err := cfg.Read(configKeyPrefix, res)
 
 	if err != nil {
 		return err
@@ -67,12 +69,12 @@ func run(configPath string) error {
 
 	svr := exechc.NewServer(res, chk)
 
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
 		log.Println("Shutting down")
-		svr.Shutdown()
+		exechc.Must(svr.Shutdown())
 	}()
 
 	return svr.Start()

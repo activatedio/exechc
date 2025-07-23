@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 type server struct {
@@ -13,7 +14,10 @@ type server struct {
 
 func (s *server) Start() error {
 	log.Printf("Listening on %s\n", s.svr.Addr)
-	s.svr.ListenAndServe()
+	err := s.svr.ListenAndServe()
+	if err != http.ErrServerClosed {
+		return err
+	}
 	log.Println("Shut down")
 	return nil
 }
@@ -22,12 +26,14 @@ func (s *server) Shutdown() error {
 	return s.svr.Shutdown(context.Background())
 }
 
+// NewServer constructs a server
 func NewServer(cfg *Runtime, chk Checker) Server {
 
 	return &server{
 		svr: &http.Server{
-			Addr: fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
-			Handler: http.HandlerFunc(func(rw http.ResponseWriter, request *http.Request) {
+			Addr:              fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+			ReadHeaderTimeout: 2 * time.Second,
+			Handler: http.HandlerFunc(func(rw http.ResponseWriter, _ *http.Request) {
 				ok, err := chk.Check()
 
 				if err != nil {
@@ -42,7 +48,8 @@ func NewServer(cfg *Runtime, chk Checker) Server {
 
 				rw.Header().Set("Content-Type", "text/plain")
 				rw.WriteHeader(http.StatusOK)
-				rw.Write([]byte("SERVING\n"))
+				_, err = rw.Write([]byte("SERVING\n"))
+				Must(err)
 			}),
 		},
 	}

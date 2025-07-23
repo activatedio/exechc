@@ -12,10 +12,12 @@ type Runtime struct {
 	CheckExpression string
 }
 
+// Checker performs actual check for health
 type Checker interface {
 	Check() (bool, error)
 }
 
+// Server handles stop and starting of server processes
 type Server interface {
 	Start() error
 	Shutdown() error

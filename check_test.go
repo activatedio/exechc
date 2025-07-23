@@ -21,7 +21,7 @@ func TestChecker_Check(t *testing.T) {
 			expression: "stdout == 'test'",
 			assert: func(got bool, err error) {
 				a.True(got)
-				a.Nil(err)
+				a.NoError(err)
 			},
 		},
 		"no match": {
@@ -29,13 +29,13 @@ func TestChecker_Check(t *testing.T) {
 			expression: "stdout == 'other'",
 			assert: func(got bool, err error) {
 				a.False(got)
-				a.Nil(err)
+				a.NoError(err)
 			},
 		},
 	}
 
 	for k, v := range cases {
-		t.Run(k, func(t *testing.T) {
+		t.Run(k, func(_ *testing.T) {
 
 			unit := exechc.NewChecker(&exechc.Runtime{
 				CheckCmd:        v.cmd,

@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	KeyStdout = "stdout"
-	KeyStderr = "stderr"
+	keyStdout = "stdout"
+	keyStderr = "stderr"
 )
 
 type checker struct {
@@ -23,7 +23,7 @@ func (c checker) Check() (bool, error) {
 	so := &bytes.Buffer{}
 	se := &bytes.Buffer{}
 
-	cmd := exec.Command("sh", "-c", c.cmd)
+	cmd := exec.Command("sh", "-c", c.cmd) //nolint:gosec // okay to pass in this command from config
 
 	cmd.Stdout = so
 	cmd.Stderr = se
@@ -35,8 +35,8 @@ func (c checker) Check() (bool, error) {
 	}
 
 	v, _, err := c.prg.Eval(map[string]any{
-		KeyStdout: so.String(),
-		KeyStderr: se.String(),
+		keyStdout: so.String(),
+		keyStderr: se.String(),
 	})
 
 	if err != nil {
@@ -53,11 +53,12 @@ func (c checker) Check() (bool, error) {
 
 }
 
+// NewChecker constructs a checker
 func NewChecker(cfg *Runtime) Checker {
 
 	env, err := cel.NewEnv(
-		cel.Variable(KeyStdout, cel.StringType),
-		cel.Variable(KeyStderr, cel.StringType),
+		cel.Variable(keyStdout, cel.StringType),
+		cel.Variable(keyStderr, cel.StringType),
 	)
 
 	Must(err)
