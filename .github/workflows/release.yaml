@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v-*'
+      - 'v*'
 env:
   ASSET_NAME: "exechc-ubuntu-x86_64.tar.gz"
 
